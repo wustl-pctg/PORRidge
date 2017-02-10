@@ -29,7 +29,7 @@ fi
 
 msg "Modified clang compiled."
 
-# # Build the runtime (ability to suspend/resume deques)
+# Build the runtime (ability to suspend/resume deques)
 cd ./cilkrtssuspend
 libtoolize
 autoreconf -i
