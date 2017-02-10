@@ -30,6 +30,10 @@ fi
 msg "Modified clang compiled."
 
 # Build the runtime (ability to suspend/resume deques)
+
+# Really this should be a submodule
+git checkout https://gitlab.com/wustl-pctg-pub/mdcilk.git cilkrtssuspend
+
 cd ./cilkrtssuspend
 libtoolize
 autoreconf -i
