@@ -23,8 +23,9 @@ CLANG_GIT_REPO="https://gitlab.com/wustl-pctg-pub/clang-cilk.git"
 CLANG_BRANCH="compressed_pedigrees"
 # We will use the master branch instead of Cilk Plus branch; we want to
 # install our own runtime instead of using theirs
-COMPILERRT_GIT_REPO="https://github.com/cilkplus/compiler-rt"
-COMPILERRT_BRANCH=""
+#COMPILERRT_GIT_REPO="https://github.com/cilkplus/compiler-rt"
+COMPILERRT_GIT_REPO="https://gitlab.com/wustl-pctg/compiler-rt.git"
+COMPILERRT_BRANCH="cilkplus-wustl"
 
 echo Building $LLVM_HOME...
 
@@ -52,16 +53,17 @@ else
     cd -
 fi
 
-rm -rf $LLVM_HOME/projects/compiler-rt
-if [ "" != "$COMPILERRT_BRANCH" ]; then
-    git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+if [ ! -d $LLVM_HOME/projects/compiler-rt ]; then
+    if [ "" != "$COMPILERRT_BRANCH" ]; then
+	git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+    else
+	git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+    fi
 else
-    git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+    cd $LLVM_HOME/projects/compiler-rt
+    git pull --rebase
+    cd -
 fi
-
-cd $LLVM_HOME/projects/compiler-rt
-git checkout b696762
-cd -
 
 BUILD_HOME=$LLVM_HOME/build
 if [ ! -d $BUILD_HOME ]; then
@@ -72,6 +74,7 @@ cd $BUILD_HOME
 set -e
 echo ../configure --prefix="$LLVM_TOP"
 
+
 if [[ ($BINUTILS_PLUGIN_DIR != "") && (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
     echo "Using bintuils gold header: $BINUTILS_PLUGIN_DIR/plugin-api.h"
     ../configure --prefix="$LLVM_TOP" --enable-targets=host --enable-optimized --with-binutils-include="$BINUTILS_PLUGIN_DIR"
@@ -81,10 +84,9 @@ else
 fi
 
 # ###### Now you're able to build the compiler
-physicalCpuCount=$([[ $(uname) = 'Darwin' ]] &&
-    sysctl -n hw.physicalcpu_max ||
-    lscpu -p | egrep -v '^#' | sort -u -t, -k 2,4 | wc -l)
-make -j$physicalCpuCount > build.log
+# old clang does not like new c++ headers...
+PRE="CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 CC=gcc-5 CXX=g++-5"
+eval "$PRE make -j > build.log"
 make install
 
 ###### Produce a shell script, "usellvm.sh", to set up environment to
