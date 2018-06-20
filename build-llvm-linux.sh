@@ -5,11 +5,6 @@
 ###### By default we assume you're using 'llvm-cilk' folder created in the current directory as a base folder of your source installation
 ###### If you use some specific location then pass it as argument to this script
 
-# Note: our version of llvm/clang is quite old, and it does not like
-# newer versions of stdlib headers that come up recent versions of
-# g++. Version 7 definitely doesn't work; I am not sure about 6.
-GCC_TOOLCHAIN=/usr/lib/gcc/x86_64-linux-gnu/5.4.1
-
 if [ "$1" = "" ]
 then
   LLVM_NAME=llvm-cilk
@@ -26,49 +21,46 @@ LLVM_GIT_REPO="https://gitlab.com/wustl-pctg-pub/llvm-cilk.git"
 LLVM_BRANCH="cilkplus"
 CLANG_GIT_REPO="https://gitlab.com/wustl-pctg-pub/clang-cilk.git"
 CLANG_BRANCH="compressed_pedigrees"
-# We will use the master branch instead of Cilk Plus branch; we want to
-# install our own runtime instead of using theirs
-#COMPILERRT_GIT_REPO="https://github.com/cilkplus/compiler-rt"
 COMPILERRT_GIT_REPO="https://gitlab.com/wustl-pctg/compiler-rt.git"
 COMPILERRT_BRANCH="cilkplus-wustl"
 
-# echo Building $LLVM_HOME...
+echo Building $LLVM_HOME...
 
-# if [ ! -d $LLVM_HOME ]; then
-#     if [ "" != "$LLVM_BRANCH" ]; then
-#         git clone -b $LLVM_BRANCH $LLVM_GIT_REPO $LLVM_HOME
-#     else
-#         git clone $LLVM_GIT_REPO $LLVM_HOME
-#     fi
-# else
-#     cd $LLVM_HOME
-#     git pull --rebase
-#     cd -
-# fi
+if [ ! -d $LLVM_HOME ]; then
+    if [ "" != "$LLVM_BRANCH" ]; then
+        git clone -b $LLVM_BRANCH $LLVM_GIT_REPO $LLVM_HOME
+    else
+        git clone $LLVM_GIT_REPO $LLVM_HOME
+    fi
+else
+    cd $LLVM_HOME
+    git pull --rebase
+    cd -
+fi
 
-# if [ ! -d $LLVM_HOME/tools/clang ]; then
-#     if [ "" != "$CLANG_BRANCH" ]; then
-#         git clone -b $CLANG_BRANCH $CLANG_GIT_REPO $LLVM_HOME/tools/clang
-#     else
-#         git clone $CLANG_GIT_REPO $LLVM_HOME/tools/clang
-#     fi
-# else
-#     cd $LLVM_HOME/tools/clang
-#     git pull --rebase
-#     cd -
-# fi
+if [ ! -d $LLVM_HOME/tools/clang ]; then
+    if [ "" != "$CLANG_BRANCH" ]; then
+        git clone -b $CLANG_BRANCH $CLANG_GIT_REPO $LLVM_HOME/tools/clang
+    else
+        git clone $CLANG_GIT_REPO $LLVM_HOME/tools/clang
+    fi
+else
+    cd $LLVM_HOME/tools/clang
+    git pull --rebase
+    cd -
+fi
 
-# if [ ! -d $LLVM_HOME/projects/compiler-rt ]; then
-#     if [ "" != "$COMPILERRT_BRANCH" ]; then
-# 	git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
-#     else
-# 	git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
-#     fi
-# else
-#     cd $LLVM_HOME/projects/compiler-rt
-#     git pull --rebase
-#     cd -
-# fi
+if [ ! -d $LLVM_HOME/projects/compiler-rt ]; then
+    if [ "" != "$COMPILERRT_BRANCH" ]; then
+	git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+    else
+	git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+    fi
+else
+    cd $LLVM_HOME/projects/compiler-rt
+    git pull --rebase
+    cd -
+fi
 
 BUILD_HOME=$LLVM_HOME/build
 if [ ! -d $BUILD_HOME ]; then
@@ -77,41 +69,26 @@ fi
 cd $BUILD_HOME
 
 set -e
-BASE="../configure --prefix=\"$LLVM_TOP\" --with-gcc-toolchain=\"$GCC_TOOLCHAIN\""
-if [ "$GCC_" = "" ]
-then
-  LLVM_NAME=llvm-cilk
-else
-  LLVM_NAME=$1
-fi
 
-
-echo "$BASE"
+# Our very old version of llvm/clang does not like new C++ headers...
+# I have tried using --with-gcc-toolchain and just setting CXX (which
+# you'd think would be enough), but somehow it still looks in the
+# g++-7 headers and finds problems.
+# CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 
+CONFIG_ARGS="--enable-targets=host --enable-optimized"
+echo ../configure $CONFIG_ARGS
 
 if [[ ($BINUTILS_PLUGIN_DIR != "") && (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
     echo "Using bintuils gold header: $BINUTILS_PLUGIN_DIR/plugin-api.h"
-    eval "$BASE --enable-targets=host --enable-optimized --with-binutils-include=\"$BINUTILS_PLUGIN_DIR\""
+    ../configure --prefix="$LLVM_TOP" $CONFIG_ARGS --with-binutils-include="$BINUTILS_PLUGIN_DIR"
 else
-    echo "NOT using bintuils gold header." 
-    eval "$BASE --enable-targets=host --enable-optimized"
+    echo "NOT using bintuils gold header."
+    ../configure --prefix="$LLVM_TOP" $CONFIG_ARGS
 fi
-
-exit
 
 # ###### Now you're able to build the compiler
 # old clang does not like new c++ headers...
-#PRE="CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 CC=gcc-5 CXX=g++-5"
+PRE="CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5"
 #eval "$PRE make -j > build.log"
 make -j > build.log
 make install
-
-###### Produce a shell script, "usellvm.sh", to set up environment to
-###### use llvm-cilk-ok.
-# echo export PATH=$LLVM_TOP/bin:'$PATH' > $LLVM_TOP/usellvm.sh
-# echo export LIBRARY_PATH=$LLVM_TOP/lib:'$LIBRARY_PATH' >> $LLVM_TOP/usellvm.sh
-# echo export LD_LIBRARY_PATH=$LLVM_TOP/lib:'$LD_LIBRARY_PATH' >> $LLVM_TOP/usellvm.sh
-# echo export C_INCLUDE_PATH=$LLVM_TOP/include:'$CPATH' >> $LLVM_TOP/usellvm.sh
-# echo export CPLUS_INCLUDE_PATH=$LLVM_TOP/include:'$CPATH' >> $LLVM_TOP/usellvm.sh
-
-###### That's it!  Source the usellvm.sh script generated by this file
-###### to set up your environment to use this compilation of LLVM.

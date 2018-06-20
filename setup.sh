@@ -13,34 +13,36 @@ err_report() {
 trap 'err_report $LINENO' ERR
 
 BASE_DIR=$(pwd)
-#rm -f setup.log
+CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 
+export CPLUS_INCLUDE_PATH
 
 function msg() {
-    echo "$msg" | tee -a setup.log
+    echo "$1" | tee -a setup.log
 }
 
-# msg "Begin PORRidge setup at $(date)"
+msg "Begin PORRidge setup at $(date)"
+rm -f setup.log
 
-# : ${BINUTILS_PLUGIN_DIR:="/usr/local/include"}
-# if [[ ($BINUTILS_PLUGIN_DIR != "") &&
-#           (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
-#     export LTO=1
-# else
-#     export LTO=0
-#     echo "Warning: no binutils plugin found, necessary for LTO"
-# fi
+: ${BINUTILS_PLUGIN_DIR:="/usr/local/include"}
+if [[ ($BINUTILS_PLUGIN_DIR != "") &&
+          (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
+    export LTO=1
+else
+    export LTO=0
+    echo "Warning: no binutils plugin found, necessary for LTO"
+fi
 
-# t=$(ldconfig -p | grep tcmalloc)
-# if [[ $? != 0 ]]; then
-#     echo "tcmalloc not found! Install google-perftools"
-# fi
+t=$(ldconfig -p | grep tcmalloc)
+if [[ $? != 0 ]]; then
+    echo "tcmalloc not found! Install google-perftools"
+fi
 
-# # Setup and compile our compiler
-# ./build-llvm-linux.sh
+# Setup and compile our compiler
+./build-llvm-linux.sh
 
-# msg "Modified clang compiled."
+msg "Modified clang compiled."
 
-# # Build the runtime (ability to suspend/resume deques)
+# Build the runtime (ability to suspend/resume deques)
 
 # It would be better to have this as a separate repo and either clone
 # it or make it a submodule. I've started a repo for this purpose at
@@ -48,16 +50,16 @@ function msg() {
 # necessary to make it work.
 # git clone https://gitlab.com/wustl-pctg/mdcilk.git cilkrtssuspend
 
-# cd ./cilkrtssuspend
-# make clean && make distclean
-# libtoolize
-# autoreconf -i
-# ./remake.sh pre opt lto
-# cd -
+cd ./cilkrtssuspend
+make clean && make distclean
+libtoolize
+autoreconf -i
+./remake.sh pre opt lto
+cd -
 
-# msg "Suspendable work-stealing runtime built"
+msg "Suspendable work-stealing runtime built"
 
-# Compile library
+## Compile library
 mkdir -p build
 BASE_DIR=$(pwd)
 if [ ! -e config.mk ]; then
@@ -68,12 +70,13 @@ if [ ! -e config.mk ]; then
     echo "LTO=$LTO" >> config.mk
 fi
 cd src
+make clean
 make -j
 cd -
 
 # Check out our fork of PBBS
 cd bench
-#git clone https://gitlab.com/robertutterback/cilkplus-tests2.git cilkplus-tests
+git clone https://gitlab.com/robertutterback/cilkplus-tests2.git cilkplus-tests
 
 # Compile benchmarks
 ./build.sh

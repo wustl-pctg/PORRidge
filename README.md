@@ -35,14 +35,16 @@ To reproduce performance results, Google's _tcmalloc_ should be
 installed. Also, the GNU _gold_ linker should be installed as
 _ld_. This requirement may be eliminated as the project is
 refactored. The benchmark script requires GNU _datamash_. Compiling
-the _dedup_ and _ferret_ benchmarks requires additional dependencies.
+the _dedup_ and _ferret_ benchmarks requires additional
+dependencies. The ones I can remember are `libssl-dev libgsl-dev
+ligjpeg62-dev libbz2-dev`
 
-If you have g++-7 (or possible g++-6) installed, you will need to
-install g++-5. Our version of llvm/clang is very old and does not like
-the newer headers. Once this is done, set the `GCC_TOOLCHAIN` variable
-in `build-llvm-linux.sh` to point to
-`/usr/lib/gcc/x86_64-linux-gnu/$VERSION`, where version is the *full*
-version number, e.g. 5.4.1.
+Depending on the version of g++ you have installed you may need to
+edit the `CPLUS_INCLUDE_PATH` variable at the top of `setup.sh`. Our
+(very old) version of llvm/clang does not like the newer stdlib
+headers that come with g++-7 (and possibly g++-6, I haven't
+tested). So I have installed g++-5 and forced clang to use that
+include path.
 
 ## Installation
 
