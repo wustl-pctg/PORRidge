@@ -11,16 +11,16 @@ LLVM_HOME=$(pwd)/../llvm-cilk
 NORM="-g -fcilk-no-inline"
 
 if [[ "$1" = "opt" || "$2" = "opt" || "$3" = "opt" ]]; then
-		OPT=" -O3 " #OPT=" -O3 -DNDEBUG "
+    OPT=" -O3 " #OPT=" -O3 -DNDEBUG "
 else
     OPT=" -O0 "
 fi
 if [[ "$1" = "lto" || "$2" = "lto" || "$3" = "lto" ]]; then
-		LTO=" -flto "
-		EXTRA=" AR_FLAGS=\"cru --plugin=$LLVM_HOME/lib/LLVMgold.so\" RANLIB=/bin/true "
+    LTO=" -flto "
+    EXTRA=" AR_FLAGS=\"cru --plugin=$LLVM_HOME/lib/LLVMgold.so\" RANLIB=/bin/true "
 fi
 if [[ "$1" = "pre" || "$2" = "pre" || "$3" = "pre" ]]; then
-		OPT+=" -DPRECOMPUTE_PEDIGREES=1 "
+    OPT+=" -DPRECOMPUTE_PEDIGREES=1 "
 fi
 
 cmd="./configure --prefix=$LLVM_HOME CC=$LLVM_HOME/bin/clang CXX=$LLVM_HOME/bin/clang++ CFLAGS=\"$NORM $OPT $LTO\" CXXFLAGS=\"$NORM  $OPT  $LTO\" $EXTRA"
@@ -28,6 +28,6 @@ cmd="./configure --prefix=$LLVM_HOME CC=$LLVM_HOME/bin/clang CXX=$LLVM_HOME/bin/
 #make clean && make distclean
 echo $cmd
 eval $cmd
-make -j
+CPLUS_INCLUDE_PATH="/usr/include:/usr/include/c++/5" make -j > build.log
 make install
 cd -

@@ -2,6 +2,17 @@
 set -e
 trap "kill -- -$$" SIGINT
 
+red=$(tput setaf 1)
+normal=$(tput sgr0)
+
+err_report() {
+    printf "%40s\n" "${red}----------------------------------------"
+    printf "benchmark run failed at line $1 of $0 \n"
+    printf "%40s\n" "----------------------------------------${normal}"
+}
+trap 'err_report $LINENO' ERR
+
+
 if [[ $(sysctl vm.max_map_count | cut -d'=' -f2 | tr -d ' ') -lt 1000000 ]]; then
     echo "vm.max_map_count too low! Must be at least 1M"
     exit 1

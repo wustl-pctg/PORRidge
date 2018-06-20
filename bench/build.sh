@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+red=$(tput setaf 1)
+normal=$(tput sgr0)
+
+err_report() {
+    printf "%40s\n" "${red}----------------------------------------"
+    printf "benchmark build failed at line $1 of $0 \n"
+    printf "%40s\n" "----------------------------------------${normal}"
+}
+trap 'err_report $LINENO' ERR
+
 SCRIPT_DIR=$(readlink -f $(dirname $0))
 CONFIG_FILE=$SCRIPT_DIR/cilkplus-tests/myconfig.mk
 

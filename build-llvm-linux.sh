@@ -5,6 +5,11 @@
 ###### By default we assume you're using 'llvm-cilk' folder created in the current directory as a base folder of your source installation
 ###### If you use some specific location then pass it as argument to this script
 
+# Note: our version of llvm/clang is quite old, and it does not like
+# newer versions of stdlib headers that come up recent versions of
+# g++. Version 7 definitely doesn't work; I am not sure about 6.
+GCC_TOOLCHAIN=/usr/lib/gcc/x86_64-linux-gnu/5.4.1
+
 if [ "$1" = "" ]
 then
   LLVM_NAME=llvm-cilk
@@ -27,43 +32,43 @@ CLANG_BRANCH="compressed_pedigrees"
 COMPILERRT_GIT_REPO="https://gitlab.com/wustl-pctg/compiler-rt.git"
 COMPILERRT_BRANCH="cilkplus-wustl"
 
-echo Building $LLVM_HOME...
+# echo Building $LLVM_HOME...
 
-if [ ! -d $LLVM_HOME ]; then
-    if [ "" != "$LLVM_BRANCH" ]; then
-        git clone -b $LLVM_BRANCH $LLVM_GIT_REPO $LLVM_HOME
-    else
-        git clone $LLVM_GIT_REPO $LLVM_HOME
-    fi
-else
-    cd $LLVM_HOME
-    git pull --rebase
-    cd -
-fi
+# if [ ! -d $LLVM_HOME ]; then
+#     if [ "" != "$LLVM_BRANCH" ]; then
+#         git clone -b $LLVM_BRANCH $LLVM_GIT_REPO $LLVM_HOME
+#     else
+#         git clone $LLVM_GIT_REPO $LLVM_HOME
+#     fi
+# else
+#     cd $LLVM_HOME
+#     git pull --rebase
+#     cd -
+# fi
 
-if [ ! -d $LLVM_HOME/tools/clang ]; then
-    if [ "" != "$CLANG_BRANCH" ]; then
-        git clone -b $CLANG_BRANCH $CLANG_GIT_REPO $LLVM_HOME/tools/clang
-    else
-        git clone $CLANG_GIT_REPO $LLVM_HOME/tools/clang
-    fi
-else
-    cd $LLVM_HOME/tools/clang
-    git pull --rebase
-    cd -
-fi
+# if [ ! -d $LLVM_HOME/tools/clang ]; then
+#     if [ "" != "$CLANG_BRANCH" ]; then
+#         git clone -b $CLANG_BRANCH $CLANG_GIT_REPO $LLVM_HOME/tools/clang
+#     else
+#         git clone $CLANG_GIT_REPO $LLVM_HOME/tools/clang
+#     fi
+# else
+#     cd $LLVM_HOME/tools/clang
+#     git pull --rebase
+#     cd -
+# fi
 
-if [ ! -d $LLVM_HOME/projects/compiler-rt ]; then
-    if [ "" != "$COMPILERRT_BRANCH" ]; then
-	git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
-    else
-	git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
-    fi
-else
-    cd $LLVM_HOME/projects/compiler-rt
-    git pull --rebase
-    cd -
-fi
+# if [ ! -d $LLVM_HOME/projects/compiler-rt ]; then
+#     if [ "" != "$COMPILERRT_BRANCH" ]; then
+# 	git clone -b $COMPILERRT_BRANCH $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+#     else
+# 	git clone $COMPILERRT_GIT_REPO $LLVM_HOME/projects/compiler-rt
+#     fi
+# else
+#     cd $LLVM_HOME/projects/compiler-rt
+#     git pull --rebase
+#     cd -
+# fi
 
 BUILD_HOME=$LLVM_HOME/build
 if [ ! -d $BUILD_HOME ]; then
@@ -72,21 +77,32 @@ fi
 cd $BUILD_HOME
 
 set -e
-echo ../configure --prefix="$LLVM_TOP"
+BASE="../configure --prefix=\"$LLVM_TOP\" --with-gcc-toolchain=\"$GCC_TOOLCHAIN\""
+if [ "$GCC_" = "" ]
+then
+  LLVM_NAME=llvm-cilk
+else
+  LLVM_NAME=$1
+fi
 
+
+echo "$BASE"
 
 if [[ ($BINUTILS_PLUGIN_DIR != "") && (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
     echo "Using bintuils gold header: $BINUTILS_PLUGIN_DIR/plugin-api.h"
-    ../configure --prefix="$LLVM_TOP" --enable-targets=host --enable-optimized --with-binutils-include="$BINUTILS_PLUGIN_DIR"
+    eval "$BASE --enable-targets=host --enable-optimized --with-binutils-include=\"$BINUTILS_PLUGIN_DIR\""
 else
     echo "NOT using bintuils gold header." 
-    ../configure --prefix="$LLVM_TOP" --enable-targets=host --enable-optimized
+    eval "$BASE --enable-targets=host --enable-optimized"
 fi
+
+exit
 
 # ###### Now you're able to build the compiler
 # old clang does not like new c++ headers...
-PRE="CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 CC=gcc-5 CXX=g++-5"
-eval "$PRE make -j > build.log"
+#PRE="CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 CC=gcc-5 CXX=g++-5"
+#eval "$PRE make -j > build.log"
+make -j > build.log
 make install
 
 ###### Produce a shell script, "usellvm.sh", to set up environment to

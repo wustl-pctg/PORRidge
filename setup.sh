@@ -1,46 +1,61 @@
 #!/bin/bash
 set -e
 
+red=$(tput setaf 1)
+normal=$(tput sgr0)
+
+err_report() {
+    printf "%40s\n" "${red}----------------------------------------"
+    printf "setup failed at line $1 of $0 \n"
+    printf "%40s\n" "----------------------------------------${normal}"
+}
+
+trap 'err_report $LINENO' ERR
+
 BASE_DIR=$(pwd)
-rm -f setup.log
+#rm -f setup.log
 
 function msg() {
     echo "$msg" | tee -a setup.log
 }
 
-msg "Begin PORRidge setup at $(date)"
+# msg "Begin PORRidge setup at $(date)"
 
-: ${BINUTILS_PLUGIN_DIR:="/usr/local/include"}
-if [[ ($BINUTILS_PLUGIN_DIR != "") &&
-          (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
-    export LTO=1
-else
-    export LTO=0
-    echo "Warning: no binutils plugin found, necessary for LTO"
-fi
+# : ${BINUTILS_PLUGIN_DIR:="/usr/local/include"}
+# if [[ ($BINUTILS_PLUGIN_DIR != "") &&
+#           (-e $BINUTILS_PLUGIN_DIR/plugin-api.h) ]]; then
+#     export LTO=1
+# else
+#     export LTO=0
+#     echo "Warning: no binutils plugin found, necessary for LTO"
+# fi
 
-t=$(ldconfig -p | grep tcmalloc)
-if [[ $? != 0 ]]; then
-    echo "tcmalloc not found! Install google-perftools"
-fi
+# t=$(ldconfig -p | grep tcmalloc)
+# if [[ $? != 0 ]]; then
+#     echo "tcmalloc not found! Install google-perftools"
+# fi
 
-# Setup and compile our compiler
-./build-llvm-linux.sh
+# # Setup and compile our compiler
+# ./build-llvm-linux.sh
 
-msg "Modified clang compiled."
+# msg "Modified clang compiled."
 
-# Build the runtime (ability to suspend/resume deques)
+# # Build the runtime (ability to suspend/resume deques)
 
-# Really this should be a submodule
-git checkout https://gitlab.com/wustl-pctg-pub/mdcilk.git cilkrtssuspend
+# It would be better to have this as a separate repo and either clone
+# it or make it a submodule. I've started a repo for this purpose at
+# https://gitlab.com/wustl-pctg/mdcilk.git, though some changes are
+# necessary to make it work.
+# git clone https://gitlab.com/wustl-pctg/mdcilk.git cilkrtssuspend
 
-cd ./cilkrtssuspend
-libtoolize
-autoreconf -i
-./remake.sh pre opt lto
-cd -
+# cd ./cilkrtssuspend
+# make clean && make distclean
+# libtoolize
+# autoreconf -i
+# ./remake.sh pre opt lto
+# cd -
 
-msg "Suspendable work-stealing runtime built"
+# msg "Suspendable work-stealing runtime built"
 
 # Compile library
 mkdir -p build
@@ -58,7 +73,7 @@ cd -
 
 # Check out our fork of PBBS
 cd bench
-git clone https://gitlab.com/robertutterback/cilkplus-tests2.git
+#git clone https://gitlab.com/robertutterback/cilkplus-tests2.git cilkplus-tests
 
 # Compile benchmarks
 ./build.sh

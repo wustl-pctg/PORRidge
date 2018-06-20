@@ -37,6 +37,13 @@ _ld_. This requirement may be eliminated as the project is
 refactored. The benchmark script requires GNU _datamash_. Compiling
 the _dedup_ and _ferret_ benchmarks requires additional dependencies.
 
+If you have g++-7 (or possible g++-6) installed, you will need to
+install g++-5. Our version of llvm/clang is very old and does not like
+the newer headers. Once this is done, set the `GCC_TOOLCHAIN` variable
+in `build-llvm-linux.sh` to point to
+`/usr/lib/gcc/x86_64-linux-gnu/$VERSION`, where version is the *full*
+version number, e.g. 5.4.1.
+
 ## Installation
 
 The script _setup.sh_ should build the modified compiler, the modified
