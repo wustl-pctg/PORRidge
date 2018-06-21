@@ -30,12 +30,12 @@ int count = 0;
 porr::spinlock g_mutex;
 
 int fib(int n) {
-	if (n < 2) {
+  if (n < 2) {
     g_mutex.lock();
     count++;
     g_mutex.unlock();
     return (n);
-	}
+  }
   
   int x, y;
   x = cilk_spawn fib(n - 1);
@@ -47,21 +47,21 @@ int fib(int n) {
 
 int main(int argc, char *argv[])
 {
-	int n, result;
+  int n, result;
 
-	if (argc != 2) {
-		fprintf(stderr, "Usage: fib [<cilk options>] <n>\n");
-		exit(1); 
-	}
-	n = atoi(argv[1]);
+  if (argc != 2) {
+    fprintf(stderr, "Usage: fib [<cilk options>] <n>\n");
+    exit(1); 
+  }
+  n = atoi(argv[1]);
 
-	auto start = std::chrono::high_resolution_clock::now();
-	result = fib(n);
-	auto end = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::high_resolution_clock::now();
+  result = fib(n);
+  auto end = std::chrono::high_resolution_clock::now();
   
-	std::cout << "PORR time: "
+  std::cout << "PORR time: "
             << std::chrono::duration_cast<std::chrono::milliseconds>
     (end - start).count() / 1000.0 << std::endl;
 
-	return 0;
+  return 0;
 }

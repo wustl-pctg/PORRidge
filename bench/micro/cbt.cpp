@@ -18,19 +18,19 @@ porr::mutex g_mutex;
 
 void tree_search(size_t index, size_t level)
 {
-	if (level == 0) {
-		g_mutex.lock();
-		g_count++;
+  if (level == 0) {
+    g_mutex.lock();
+    g_count++;
     if (g_leaf_work > 0.0) sleep(g_leaf_work);
-		g_mutex.unlock();
+    g_mutex.unlock();
     if (g_unlock_work > 0.0) sleep(g_unlock_work);
-		return;
-	}
+    return;
+  }
 
-	cilk_spawn tree_search(index, level-1);
-	tree_search(index+1, level-1);
-	cilk_sync;
-	return;
+  cilk_spawn tree_search(index, level-1);
+  tree_search(index+1, level-1);
+  cilk_sync;
+  return;
 }
 
 // ./cbt <# acquires> <depth> [leaf work time (ms)]
@@ -69,5 +69,5 @@ int main(int argc, char *argv[])
   std::cout << "PORR time: "
             << std::chrono::duration_cast<std::chrono::milliseconds>
     (end - start).count() << std::endl;
-	return 0;
+  return 0;
 }

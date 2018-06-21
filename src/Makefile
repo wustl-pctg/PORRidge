@@ -1,6 +1,6 @@
 include ../common.mk
 
-OBJ = spinlock.o porr.o acquire.o
+OBJ = spinlock.o porr.o acquire.o trylock.o
 .SECONDARY: $(OBJ)
 
 .PHONY: default
@@ -9,8 +9,9 @@ default: $(LIBNAME)
 %.a: $(OBJ)
 	$(AR) $(ARFLAGS) $@ $^
 
+# CILKFLAGS only needed to access the Cilk API without compiler error.
 %.o: %.cpp %.h util.h
-	$(CXX) $(CFLAGS) $(CILKFLAGS) -c $(*:=.cpp)
+	$(CXX) $(CXXFLAGS) $(CILKFLAGS) -c $(*:=.cpp)
 
 clean:
 	rm -f *.o

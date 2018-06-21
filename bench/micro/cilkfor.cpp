@@ -7,7 +7,7 @@
 #include <cilk/cilk.h>
 #include <cilk/cilk_api.h>
 
-#include "mutex.h"
+#include "spinlock.h"
 #include "acquire.h"
 
 // cilkfor <# acquires> <# locks> [lock work time (ms)] [unlock work time (ms)]
@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  porr::mutex *locks = new porr::mutex[num_locks];
-  // porr::mutex *locks = (porr::mutex*) malloc(num_locks
-  //                                                * porr::mutex::memsize());
+  porr::spinlock *locks = new porr::spinlock[num_locks];
+  // porr::spinlock *locks = (porr::spinlock*) malloc(num_locks
+  //                                                * porr::spinlock::memsize());
   // cilk_for (int i = 0; i < num_locks; ++i)
-  //   new (&locks[i]) porr::mutex(i);
+  //   new (&locks[i]) porr::spinlock(i);
 
 #pragma cilk grainsize = 1
-	cilk_for (int i = 0; i < num_acquires; ++i) {
+  cilk_for (int i = 0; i < num_acquires; ++i) {
 
     if (unlock_time > 0.0) sleep(unlock_time);
     
@@ -40,11 +40,11 @@ int main(int argc, char *argv[])
     locks[i % num_locks].unlock();
   }
   free(locks);
-	auto end = std::chrono::high_resolution_clock::now();
+  auto end = std::chrono::high_resolution_clock::now();
   assert(count == num_acquires);
   std::cout << "PORR time: "
             << std::chrono::duration_cast<std::chrono::milliseconds>
     (end - start).count() / 1000.0<< std::endl;
   
-	return 0;
-  }
+  return 0;
+}

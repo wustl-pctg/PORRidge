@@ -1,12 +1,15 @@
 BASE_DIR=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 include $(BASE_DIR)/config.mk
 
-CC=$(COMPILER_HOME)/bin/clang
-CXX=$(COMPILER_HOME)/bin/clang++
+PORR_HOME = $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+CILKRTS_HOME = $(PORR_HOME)/llvm-cilk
+
+CC := $(COMPILER_HOME)/bin/clang++
+CXX := $(COMPILER_HOME)/bin/clang++
 LIBNAME = $(BUILD_DIR)/libporr.a
 
 INC = -I$(RUNTIME_HOME)/include
-LDFLAGS = -ldl -lpthread -ltcmalloc
+LDLIBS = -ldl -lpthread -ltcmalloc
 ARFLAGS = rcs
 OPT = -O3 #-march=native -DNDEBUG
 
@@ -22,5 +25,7 @@ ifeq ($(LTO),1)
 	ARFLAGS += --plugin $(COMPILER_HOME)/lib/LLVMgold.so
 endif
 
-CFLAGS = -g -std=c++11 -Wfatal-errors $(OPT) $(DEFS) $(INC)
-CILKFLAGS = -fcilkplus -fcilk-no-inline
+FLAGS = -g -Wfatal-errors -Werror $(OPT) $(DEFS) $(INC)
+CFLAGS = $(FLAGS) -std=c11
+CXXFLAGS := $(FLAGS) -std=c++11 
+CILKFLAGS := -fcilkplus -fcilk-no-inline
