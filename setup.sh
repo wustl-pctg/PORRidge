@@ -76,7 +76,9 @@ cd -
 
 # Check out our fork of PBBS
 cd bench
-git clone https://gitlab.com/robertutterback/cilkplus-tests2.git cilkplus-tests
+if [ ! -d cilkplus-tests ]; then
+    git clone https://gitlab.com/robertutterback/cilkplus-tests2.git cilkplus-tests
+fi
 
 # Compile benchmarks
 ./build.sh
