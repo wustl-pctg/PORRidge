@@ -14,8 +14,9 @@ namespace porr {
 		/*const*/ pedigree_t ped;
 		full_pedigree_t full = {0, nullptr};
 		acquire_info *chain_next = nullptr;
-    void * suspended_deque = nullptr;
-
+		void * suspended_deque = nullptr;
+		int t_fail_counter = 0;
+		
     // thread local allocator requires this
     acquire_info *next = nullptr;
     
