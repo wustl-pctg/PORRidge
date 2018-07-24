@@ -1,7 +1,7 @@
 #ifndef _ACQUIRE_H
 #define _ACQUIRE_H
 
-#include <chrono> // perf debug timing
+//#include <chrono> // perf debug timing
 
 #include "util.h"
 
@@ -13,8 +13,13 @@ namespace porr {
 	public:
 		/*const*/ pedigree_t ped;
 		full_pedigree_t full = {0, nullptr};
+
+		// Don't think this was necessary at all? Make sure the old system still works...
 		acquire_info *chain_next = nullptr;
+
+#ifndef USE_CILKRTSRR // Needed for regular PORR
     void * suspended_deque = nullptr;
+#endif
 
     // thread local allocator requires this
     acquire_info *next = nullptr;
@@ -93,9 +98,11 @@ namespace porr {
 		
 		acquire_info* add(pedigree_t p); // for record
     acquire_info* add(pedigree_t p, full_pedigree_t full); // for replay
+		acquire_info* add_fake(full_pedigree_t full);
     // acquire_info* bucket_find(acquire_info **const bucket, const pedigree_t& p);
 
     acquire_info* find(const pedigree_t& p);
+		acquire_info* find(full_pedigree_t& p);
     //acquire_info* find(const pedigree_t& p, const full_pedigree_t& full);
 
 	};

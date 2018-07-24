@@ -11,7 +11,7 @@ LIBNAME = $(BUILD_DIR)/libporr.a
 INC = -I$(RUNTIME_HOME)/include
 LDLIBS = -ldl -lpthread -ltcmalloc
 ARFLAGS = rcs
-OPT = -O3 #-march=native -DNDEBUG
+OPT ?= -O3
 
 STATS ?= 0
 PTYPE ?= 1
@@ -23,6 +23,10 @@ ifeq ($(LTO),1)
 	OPT += -flto
 	LDFLAGS += -flto
 	ARFLAGS += --plugin $(COMPILER_HOME)/lib/LLVMgold.so
+endif
+
+ifeq ($(rr),rts)
+	DEFS += -DUSE_CILKRTSRR
 endif
 
 FLAGS = -g -Wfatal-errors -Werror $(OPT) $(DEFS) $(INC)

@@ -91,6 +91,20 @@ namespace porr {
   }
 #endif
 
+	// This is only called by the internal rrmutex, and it's okay to not find it (trylock).
+	acquire_info* acquire_container::find(full_pedigree_t& p) {
+		for (acquire_info* a = &m_start[m_index]; a != &m_start[m_size]; ++a) {
+			if (a->full == p) {
+				delete p.array;
+				return a;
+			}
+		}
+		return nullptr;
+		// fprintf(stderr, "Error: internal (fake) pedigree not found: worker %lu, steal %lu\n",
+		// 				p.array[0], p.array[1]);
+		// std::abort();
+	}
+
   acquire_info* acquire_container::find(const pedigree_t& p)
   {
     //return nullptr
@@ -308,13 +322,17 @@ namespace porr {
     return a;
   }
 
-  acquire_info* acquire_container::add(pedigree_t p)
-  {
+	acquire_info* acquire_container::add_fake(full_pedigree_t full) {
+    acquire_info *a = new(new_acquire_info()) acquire_info(0, full);
+		m_size++;
+		m_it = m_it->next = a;
+		return a;
+	}
+
+  acquire_info* acquire_container::add(pedigree_t p) {
 
     acquire_info *a = new(new_acquire_info()) acquire_info(p);
-    //acquire_info *a = new_acquire_info();
     m_size++;
-
   
 #if PTYPE == PARRAY
     a->full = get_full_pedigree();

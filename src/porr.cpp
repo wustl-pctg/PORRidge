@@ -241,11 +241,11 @@ namespace porr {
   {
     if (m_mode != RECORD) return;
 
-    fprintf(stderr, "Base lock size: %lu\n", sizeof(pthread_spinlock_t));
-    fprintf(stderr, "PORR spinlock size: %lu\n", sizeof(porr::spinlock));
-    fprintf(stderr, "Acquire container size: %lu\n", sizeof(acquire_container));
-    fprintf(stderr, "Acquire info size: %lu\n", sizeof(acquire_info));
-    fprintf(stderr, "Locks: %lu\n", m_num_locks);
+    // fprintf(stderr, "Base lock size: %lu\n", sizeof(pthread_spinlock_t));
+    // fprintf(stderr, "PORR spinlock size: %lu\n", sizeof(porr::spinlock));
+    // fprintf(stderr, "Acquire container size: %lu\n", sizeof(acquire_container));
+    // fprintf(stderr, "Acquire info size: %lu\n", sizeof(acquire_info));
+    // fprintf(stderr, "Locks: %lu\n", m_num_locks);
     
 #if STAGE < 4
     return;

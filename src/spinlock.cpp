@@ -85,6 +85,14 @@ namespace porr {
     fprintf(stderr, "try_lock not implemented in this version of PORRidge!\n");
     std::abort();
     base_trylock(&m_lock);
+
+		// Actually, This can be used, but VERY carefully. It's only valid
+		// use is a single attempt at getting the lock --- if it fails,
+		// give up and move on. Don't use this in a loop.
+
+		// @TODO:
+		// record: if success, record. if fail, do nothing.
+		// replay: if current pedigree in the record, wait for it. Otherwise, we know we failed, so move on.
   }
 
   void spinlock::unlock()
@@ -92,6 +100,8 @@ namespace porr {
     if (get_mode() == REPLAY) replay_unlock();
     else
       release();
+
+		// @TODO: Why is this necessary? Give an example here...
     if (get_mode() != NONE)
       __cilkrts_bump_worker_rank();
   }
@@ -106,7 +116,7 @@ namespace porr {
 
   void spinlock::replay_lock(acquire_info* a)
   {
-    acquire_info *front = m_acquires.current();;
+    acquire_info *front = m_acquires.current();
     void *deque = __cilkrts_get_deque();
     
     // FAA returns old value
