@@ -1,10 +1,11 @@
 include test.mk
 
-TESTS = trylock
+TESTS = trylock spinlock
 
 default: $(TESTS)
 
 trylock: trylock.o
+spinlock: spinlock.o
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $<
