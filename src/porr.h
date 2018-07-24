@@ -10,6 +10,7 @@
 #include "acquire.h"
 
 namespace porr {
+  class trylock;
   
   class state {
   private:
@@ -19,6 +20,8 @@ namespace porr {
       size_t size;
       achunk* next = nullptr;
       T* data;
+      static __thread int t_fail_count;
+      static __thread trylock* t_current_lock;
 
       achunk() = delete;
     achunk(size_t _size) : size(_size)

@@ -19,6 +19,7 @@ namespace porr {
 
 #ifndef USE_CILKRTSRR // Needed for regular PORR
     void * suspended_deque = nullptr;
+		int t_fail_counter = 0;
 #endif
 
     // thread local allocator requires this
