@@ -1,8 +1,8 @@
 include ../common.mk
 
-OBJ = porr.o acquire.o trylock.o deadlock.o
+OBJ = porr.o acquire.o deadlock.o
 ifneq ($(rr),rts)
-OBJ += spinlock.o
+OBJ += spinlock.o trylock.o
 endif
 .SECONDARY: $(OBJ)
 
