@@ -101,8 +101,10 @@ namespace porr {
 
 	} full_pedigree_t;
   
-	full_pedigree_t get_full_pedigree();
-	pedigree_t get_pedigree();
+	//full_pedigree_t get_full_pedigree();
+	//pedigree_t get_pedigree();
+	full_pedigree_t get_full_pedigree(const __cilkrts_pedigree tmp = __cilkrts_get_pedigree());
+	pedigree_t get_pedigree(const __cilkrts_pedigree tmp = __cilkrts_get_pedigree());
 
 	enum mode {
 		NONE = 0,

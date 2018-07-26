@@ -15,7 +15,7 @@ namespace porr {
 		full_pedigree_t full = {0, nullptr};
 
 		// Don't think this was necessary at all? Make sure the old system still works...
-		acquire_info *chain_next = nullptr;
+		//acquire_info *chain_next = nullptr;
 
 #ifndef USE_CILKRTSRR // Needed for regular PORR
     void * suspended_deque = nullptr;
