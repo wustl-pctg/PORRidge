@@ -17,6 +17,7 @@ public:
 	class achunk {
 	public:
 		size_t size;
+		size_t i = 0; // added for cilkrtsrr...
 		achunk* next = nullptr;
 		T* data;
 		

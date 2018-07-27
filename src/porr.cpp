@@ -247,6 +247,7 @@ size_t state::num_digits(size_t num)
 }
 std::pair<size_t,uint64_t>
 state::output_chunks(std::ofstream& output, achunk<CHUNK_TYPE> *first_chunk) {
+	long start_pos = output.tellp();
 	// Reserve space for writing out the number of locks and acquires
 	// This is pretty hackish....
 	for (int i = 0; i < 2; ++i) {
@@ -280,12 +281,10 @@ state::output_chunks(std::ofstream& output, achunk<CHUNK_TYPE> *first_chunk) {
 		c = c->next;
 	}
 
-	// output << "---- Stats ----" << std::endl;
-	// output << "Conflicts: " << num_conflicts << std::endl;
-
 
 	// Go back to beginning and write number of locks and acquires
-	output.seekp(0, std::ios_base::beg);
+	//output.seekp(0, std::ios_base::beg);
+	output.seekp(start_pos);
 	output << global_index;
 	for (int i = 0; i < 20-num_digits(global_index); ++i)
 		output << " ";
