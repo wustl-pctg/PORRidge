@@ -1,5 +1,4 @@
 // Basic test of spinlock record and replay functionality.
-
 #ifdef USE_CILKRTSRR
 #include "deadlock.h"
 using spinlock_t = porr::deadlock;
@@ -8,7 +7,7 @@ using spinlock_t = porr::deadlock;
 using spinlock_t = porr::spinlock;
 #endif
 
-#include <iostream>
+#include <cstdio>
 
 #include <cilk/cilk.h>
 #include <cilk/cilk_api.h>
@@ -31,8 +30,9 @@ void loop(int n) {
 int main(int argc, char *argv[]) {
   size_t num_threads = (argc > 1) ? std::strtoul(argv[1], nullptr, 0) : 4096;
 	loop(num_threads/2);
+	fprintf(stderr, "in between\n");
 	loop(num_threads/2);
-  std::cout << "Result: " << g_val << std::endl;
+	printf("Result: %i\n", g_val);
   return 0;
 
 }
