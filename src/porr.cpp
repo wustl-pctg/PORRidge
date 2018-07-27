@@ -239,10 +239,10 @@ state::read_log(std::ifstream& input, achunk<CHUNK_TYPE>*& chunk, acquire_info*&
 size_t state::num_digits(size_t num)
 {
 	size_t digits = 0;
-	while (num) {
+        do { // count 1 digit even if it's 0
 		num /= 10;
 		digits++;
-	}
+	} while (num); 
 	return digits;
 }
 std::pair<size_t,uint64_t>
