@@ -28,10 +28,13 @@ void loop(int n) {
 
 // spinlock [# threads]
 int main(int argc, char *argv[]) {
-  size_t num_threads = (argc > 1) ? std::strtoul(argv[1], nullptr, 0) : 4096;
-	loop(num_threads/2);
-	fprintf(stderr, "in between\n");
-	loop(num_threads/2);
+  size_t inner = (argc > 1) ? std::strtoul(argv[1], nullptr, 0) : 4096;
+	size_t outer = (argc > 2) ? std::strtoul(argv[2], nullptr, 0) : 8;
+
+	for (int i = 0; i < outer; ++i) {
+		//fprintf(stderr, "Iter %i\n", i);
+		loop(inner);
+	}
 	printf("Result: %i\n", g_val);
   return 0;
 
