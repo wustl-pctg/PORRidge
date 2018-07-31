@@ -60,9 +60,6 @@ namespace porr {
     size_t hash(full_pedigree_t k);
 #endif
     
-    // inline size_t hash(pedigree_t k) { return k % m_num_buckets; }
-		// void rehash(size_t new_cap);
-
     // Chunked linked list that stores the actual acquire_info structs
     acquire_info* new_acquire_info();
 
@@ -80,10 +77,8 @@ namespace porr {
     __thread static size_t t_index;
     __thread static struct chunk* t_first_chunk;
     __thread static struct chunk* t_current_chunk;
-    
 
     acquire_container(acquire_container const&) = delete;
-    /* acquire_container() {} */
 
 #ifdef ACQ_PTR
     acquire_container() {}
@@ -93,19 +88,14 @@ namespace porr {
 #endif
 
     inline acquire_info* current() { return m_it; }
-
-    // The read of m_it is killing us during replay...
     inline acquire_info* next() { m_it = m_it->next; m_index++; return m_it; }
 		
 		acquire_info* add(pedigree_t p); // for record
     acquire_info* add(pedigree_t p, full_pedigree_t full); // for replay
 		acquire_info* add_fake(full_pedigree_t full);
-    // acquire_info* bucket_find(acquire_info **const bucket, const pedigree_t& p);
 
     acquire_info* find(const pedigree_t& p);
 		acquire_info* find(full_pedigree_t& p);
-    //acquire_info* find(const pedigree_t& p, const full_pedigree_t& full);
-
 	};
 
 }

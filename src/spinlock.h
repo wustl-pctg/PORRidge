@@ -9,7 +9,7 @@ namespace porr {
 
 #ifdef DEBUG_ACQUIRE
     __cilkrts_worker *m_owner = nullptr;
-    acquire_info volatile *m_active = nullptr;
+    acquire_info *volatile m_active = nullptr;
 #endif
 #ifdef PORR_STATS
     uint64_t m_num_acquires;

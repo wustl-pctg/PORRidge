@@ -75,7 +75,7 @@ namespace porr {
       replay_lock(m_acquires.find((const pedigree_t)p));
     } else
       base_lock(&m_lock);
-      
+
     acquire();
     if (get_mode() == RECORD) record_acquire(p);
   }

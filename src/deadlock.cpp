@@ -1,6 +1,7 @@
 #include "deadlock.h"
 
 #include <cassert>
+#include <cstdio>
 
 namespace porr {
 
@@ -28,7 +29,7 @@ namespace porr {
     
     if (m == REPLAY) replay_lock(p);
 		else base_lock(&m_lock);
-      
+		
     if (m == RECORD) record_acquire(p);
   }
 
@@ -44,13 +45,16 @@ namespace porr {
   void deadlock::record_acquire(pedigree_t& p) { m_acquires.add(p); }
 
 	void deadlock::replay_wait(acquire_info *a) {
-		volatile acquire_info *front = nullptr;
+		acquire_info *volatile front = nullptr;
 		while (front != a)
 			front = m_acquires.current();
 	}
 
 	void deadlock::replay_lock(pedigree_t& p) {
 		acquire_info *a = m_acquires.find((const pedigree_t)p);
+		if (!a) {
+			fprintf(stderr, "Ped %lu not found for main lock!\n", p);
+		}
 		assert(a);
 		replay_wait(a);
   }

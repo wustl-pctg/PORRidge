@@ -56,9 +56,7 @@ rank_t* allocate_full_ped_array(size_t len)
 	return ped;
 }
 
-full_pedigree_t get_full_pedigree(const __cilkrts_pedigree tmp)
-{
-	//const __cilkrts_pedigree tmp = __cilkrts_get_pedigree();
+full_pedigree_t get_full_pedigree(const __cilkrts_pedigree tmp) {
 	const __cilkrts_pedigree *current = &tmp;
 	full_pedigree_t p = {0, nullptr};
 
@@ -86,9 +84,7 @@ full_pedigree_t get_full_pedigree(const __cilkrts_pedigree tmp)
 	return p;
 }
 
-pedigree_t get_pedigree(const __cilkrts_pedigree tmp)
-{
-	//const __cilkrts_pedigree tmp = __cilkrts_get_pedigree();
+pedigree_t get_pedigree(const __cilkrts_pedigree tmp) {
 	const __cilkrts_pedigree* current = &tmp;
 	pedigree_t p;
 
@@ -505,5 +501,6 @@ void sls_print_accum_stats(void)
 	printf("contend %8lu, acquire %8lu, wait %10lu (cyc), held %10lu (cyc)\n",
 				 contend, acquire, wait, held);
 }
+
 }
 #endif
