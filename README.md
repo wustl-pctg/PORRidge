@@ -93,5 +93,5 @@ function beforehand. For any cilk_for loops you should also manually specify the
 
 	#pragma cilk grainsize = 1024
 	
-These restrictions allowed for an easier implementation; they are no
+These restrictions allowed for an easier implementation; they are not
 inherent to the design of PORRidge.
