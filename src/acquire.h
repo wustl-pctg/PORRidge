@@ -64,7 +64,8 @@ namespace porr {
     acquire_info* new_acquire_info();
 
 	public:
-    acquire_info *m_it = nullptr;
+		// For regular (suspend/resume), volatile is not necessary.
+    acquire_info *volatile m_it = nullptr;
     size_t m_size = 0; /// Is this necessary?
     size_t m_index = 0;
       
@@ -87,7 +88,7 @@ namespace porr {
     acquire_container(acquire_info** start_ptr);
 #endif
 
-    inline acquire_info* current() { return m_it; }
+    inline acquire_info*volatile current() { return m_it; }
     inline acquire_info* next() { m_it = m_it->next; m_index++; return m_it; }
 		
 		acquire_info* add(pedigree_t p); // for record
