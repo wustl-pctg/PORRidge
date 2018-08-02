@@ -61,23 +61,6 @@ void deadlock::unlock() {
 
 bool deadlock::try_lock() { assert(0); }
 
-void deadlock::record_acquire(pedigree_t& p) { m_acquires.add(p); }
-
-void deadlock::replay_wait(acquire_info *a) {
-  acquire_info *volatile front = nullptr;
-  while (front != a)
-    front = m_acquires.current();
-}
-
-void deadlock::replay_lock(pedigree_t& p) {
-  acquire_info *a = m_acquires.find((const pedigree_t)p);
-  if (!a) {
-    fprintf(stderr, "Ped %lu not found for main lock!\n", p);
-  }
-  assert(a);
-  replay_wait(a);
-}
-
 void deadlock::replay_unlock() {
   acquire_info *front = m_acquires.current();
   if (front) m_acquires.next();
