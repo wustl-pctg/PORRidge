@@ -1,14 +1,20 @@
 #ifdef PORR
 #include <porr.h>
+
+#ifdef CILKRTSRR
+#include <deadlock.h>
+typedef porr::deadlock lock_t;
+#else
 #include <spinlock.h>
 typedef porr::spinlock lock_t;
+#endif
 
-inline void lock_init(lock_t *l, int i) { new (l) porr::spinlock(i); }
-inline void lock_destroy(lock_t *l) { l->~spinlock(); }
+inline void lock_init(lock_t *l, int i) { new (l) lock_t(i); }
+inline void lock_destroy(lock_t *l) { l->~lock_t(); }
 inline void lock(lock_t *l) { l->lock(); }
 inline void unlock(lock_t *l) { l->unlock(); }
-  
-#else 
+
+#else
 #include <pthread.h>
 typedef pthread_spinlock_t lock_t;
 

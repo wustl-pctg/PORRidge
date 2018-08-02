@@ -22,14 +22,14 @@ fi
 function ferret() {
     cd ferret
     make clean; make base -j
-    make clean; make -j
+    make clean; make -j rr=rts
     cd -
 }
 
 function dedup() {
     cd dedup
     make clean; make base -j
-    make clean; make -j
+    make clean; make -j rr=rts
     cd -
 }
 

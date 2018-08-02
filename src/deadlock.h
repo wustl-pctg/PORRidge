@@ -10,7 +10,7 @@ namespace porr {
 
     // Record/Replay fields
     acquire_container m_acquires;
-            
+
     void record_acquire(pedigree_t& p);
     void replay_lock(pedigree_t& p);
     void replay_unlock();
@@ -25,6 +25,7 @@ namespace porr {
 
     void lock();
     void unlock();
+    bool try_lock();
 
   };
 

@@ -107,7 +107,7 @@ pedigree_t get_pedigree(const __cilkrts_pedigree tmp) {
 	}
 	p %= big_prime;
 #endif
-    
+
 	return p;
 }
 
@@ -135,7 +135,7 @@ state::state() : m_mode(NONE)
 
 	env = std::getenv("PORR_MODE");
 	if (!env) return;
-    
+
 	std::string mode = env;
 	if (mode == "record") {
 		m_mode = RECORD;
@@ -162,7 +162,7 @@ state::read_log(std::ifstream& input, achunk<CHUNK_TYPE>*& chunk, acquire_info*&
 	size_t num_locks;
 	uint64_t num_acquires;
 	std::string line;
-	
+
 	input >> num_locks;
 	input >> num_acquires;
 
@@ -199,7 +199,7 @@ state::read_log(std::ifstream& input, achunk<CHUNK_TYPE>*& chunk, acquire_info*&
 
 			getline(input, line);
 			size_t ind = line.find('[');
-        
+
 			p = std::stoul(line.substr(0,ind)); // read in compressed pedigree
 			if (ind != std::string::npos) { // found full pedigree
 				full.length = std::count(line.begin(), line.end(), ',');
@@ -211,7 +211,7 @@ state::read_log(std::ifstream& input, achunk<CHUNK_TYPE>*& chunk, acquire_info*&
 					ind = next_ind;
 				}
 			}
-        
+
 			acquire_info *a = new (&acquires[global_index]) acquire_info(p, full);
 			acquires[global_index-1].next = a;
 			global_index++;
@@ -238,7 +238,7 @@ size_t state::num_digits(size_t num)
         do { // count 1 digit even if it's 0
 		num /= 10;
 		digits++;
-	} while (num); 
+	} while (num);
 	return digits;
 }
 std::pair<size_t,uint64_t>
@@ -302,7 +302,7 @@ state::~state()
 	// fprintf(stderr, "Acquire container size: %lu\n", sizeof(acquire_container));
 	// fprintf(stderr, "Acquire info size: %lu\n", sizeof(acquire_info));
 	// fprintf(stderr, "Locks: %lu\n", m_num_locks);
-    
+
 #if STAGE < 4
 	return;
 #endif
@@ -355,7 +355,7 @@ void state::unregister_spinlock(size_t size)
 
 /** Since the order of initialization between compilation units is
 		undefined, we want to make sure the global porr state is created
-		before everything else and destroyed after everything else. 
+		before everything else and destroyed after everything else.
 
 		I also need to use a pointer to the global state; otherwise the
 		constructor and destructor will be called multiple times. Doing so
@@ -383,7 +383,7 @@ __attribute__((constructor(101))) void porr_init(void)
 	porr::g_rr_state = new porr::state();
 #ifdef USE_LOCKSTAT
 	sls_setup();
-#endif    
+#endif
 
 #if STATS > 0
 	memset(g_stats, 0, sizeof(uint64_t) * NUM_GLOBAL_STATS);
@@ -402,7 +402,7 @@ __attribute__((destructor(101))) void porr_deinit(void)
 #ifdef USE_LOCKSTAT
 	// sls_print_stats();
 	sls_print_accum_stats();
-#endif    
+#endif
 
 #if STATS > 0
 	int ret = PAPI_read_counters(papi_counts, NUM_PAPI_EVENTS);
@@ -415,7 +415,7 @@ __attribute__((destructor(101))) void porr_deinit(void)
 
 	uint64_t accum[NUM_LOCAL_STATS];
 	int p = __cilkrts_get_nworkers();
-    
+
 	for (int i = 0; i < NUM_LOCAL_STATS; ++i) {
 		accum[i] = 0;
 		for (int j = 0; j < p; ++j)
@@ -432,14 +432,14 @@ __attribute__((destructor(101))) void porr_deinit(void)
 
 #endif
 
-	delete porr::g_rr_state;
-
 #ifdef USE_CILKRTSRR
 	// Normally this is never called, since eventually the process will
 	// end anyway. But in this case I need to make sure that each thread
 	// runs the cilkrtsrr_per_worker_destroy functions.
 	__cilkrts_end_cilk();
 #endif
+
+  delete porr::g_rr_state;
 }
 }
 
@@ -460,13 +460,13 @@ static void sls_print_lock(struct spinlock_stat *l)
 					l->contend, l->acquire, l->wait, l->held);
 }
 
-static void sls_accum_lock_stat(struct spinlock_stat *l, 
+static void sls_accum_lock_stat(struct spinlock_stat *l,
                                 unsigned long *contend, unsigned long *acquire,
-                                unsigned long *wait, unsigned long *held) 
+                                unsigned long *wait, unsigned long *held)
 {
-	*contend += l->contend; 
-	*acquire += l->acquire; 
-	*wait += l->wait; 
+	*contend += l->contend;
+	*acquire += l->acquire;
+	*wait += l->wait;
 	*held += l->held;
 	assert(*contend >= l->contend);
 	assert(*acquire >= l->acquire);
