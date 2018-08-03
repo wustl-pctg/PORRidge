@@ -2,7 +2,7 @@
 #set -x
 T=20
 
-for N in 2 4 8 32; do
+for N in 2 4 8 16; do
  		export CILK_NWORKERS=$N
 		printf "N=$N:\t"
  		for i in {1..100}; do

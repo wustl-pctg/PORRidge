@@ -24,7 +24,6 @@ LDFLAGS = -lrt -ldl -lpthread -ltcmalloc
 ARFLAGS = rcs
 OPT ?= -O0 #-O3 -march=native -DNDEBUG
 
-
 LTO ?= 1
 ifeq ($(LTO),1)
   OPT += -flto
@@ -40,6 +39,7 @@ ifeq ($(rr),rts)
   # cilkrtsrr and porr (with rr=rts) actually depend on each other, so
   # need to add PORR_LIBS (libporr.a) again here...
   LIBS += $(PORR_LIBS)
+  LIBS += $(CILKRTS_HOME)/lib/libcilkrtsrr.a
 else
   LIBS += $(CILKRTS_HOME)/lib/libcilkrts.a
 endif

@@ -20,7 +20,7 @@ fi
 type datamash &>/dev/null || { 
     echo >&2 "This script requries datamash. Aborting. "
     echo >&2 "On Ubuntu 14+, this can be installed with apt-get."; 
-    exit 1; 
+    exit 1;
 }
 
 

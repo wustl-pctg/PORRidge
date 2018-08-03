@@ -9,7 +9,7 @@ TARGET = dedup
 include ../../../bench.mk
 
 # let's use cpp compiler for everything
-# CC = $(CXX) 
+# CC = $(CXX)
 
 PROG = dedup-reducer dedup-serial dedup-lock 
 all: $(PROG)
@@ -17,9 +17,9 @@ reducer: dedup-reducer
 serial: dedup-serial
 lock: dedup-lock
 
-ifeq ($(PROF),1)
+# ifeq ($(PROF),1)
   FLAGS += -g
-endif
+# endif
 
 export UTIL_OBJ LIBS CFLAGS
 
