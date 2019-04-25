@@ -1,14 +1,27 @@
 #!/bin/bash
 set -e
 
+red=$(tput setaf 1)
+normal=$(tput sgr0)
+
+err_report() {
+    printf "%40s\n" "${red}----------------------------------------"
+    printf "setup failed at line $1 of $0 \n"
+    printf "%40s\n" "----------------------------------------${normal}"
+}
+
+trap 'err_report $LINENO' ERR
+
 BASE_DIR=$(pwd)
-rm -f setup.log
+CPLUS_INCLUDE_PATH=/usr/include:/usr/include/c++/5 
+export CPLUS_INCLUDE_PATH
 
 function msg() {
-    echo "$msg" | tee -a setup.log
+    echo "$1" | tee -a setup.log
 }
 
 msg "Begin PORRidge setup at $(date)"
+rm -f setup.log
 
 : ${BINUTILS_PLUGIN_DIR:="/usr/local/include"}
 if [[ ($BINUTILS_PLUGIN_DIR != "") &&
@@ -29,8 +42,16 @@ fi
 
 msg "Modified clang compiled."
 
-# # Build the runtime (ability to suspend/resume deques)
+# Build the runtime (ability to suspend/resume deques)
+
+# It would be better to have this as a separate repo and either clone
+# it or make it a submodule. I've started a repo for this purpose at
+# https://gitlab.com/wustl-pctg/mdcilk.git, though some changes are
+# necessary to make it work.
+# git clone https://gitlab.com/wustl-pctg/mdcilk.git cilkrtssuspend
+
 cd ./cilkrtssuspend
+make clean && make distclean
 libtoolize
 autoreconf -i
 ./remake.sh pre opt lto
@@ -38,7 +59,12 @@ cd -
 
 msg "Suspendable work-stealing runtime built"
 
-# Compile library
+# Checkout the PARRot runtime system. Warning: The scripts that use
+# this have not been thoroughly tested, so they make take some effort
+# to get working. I am not entirely sure this repo is public yet.
+git clone -b record-replay https://gitlab.com/wustl-pctg/cilkplus-rts cilkrtsrr
+
+## Compile library
 mkdir -p build
 BASE_DIR=$(pwd)
 if [ ! -e config.mk ]; then
@@ -49,12 +75,15 @@ if [ ! -e config.mk ]; then
     echo "LTO=$LTO" >> config.mk
 fi
 cd src
+make clean
 make -j
 cd -
 
 # Check out our fork of PBBS
 cd bench
-git clone https://gitlab.com/robertutterback/cilkplus-tests2.git
+if [ ! -d cilkplus-tests ]; then
+    git clone https://gitlab.com/robertutterback/cilkplus-tests.git cilkplus-tests
+fi
 
 # Compile benchmarks
 ./build.sh
