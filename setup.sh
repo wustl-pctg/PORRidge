@@ -59,6 +59,11 @@ cd -
 
 msg "Suspendable work-stealing runtime built"
 
+# Checkout the PARRot runtime system. Warning: The scripts that use
+# this have not been thoroughly tested, so they make take some effort
+# to get working. I am not entirely sure this repo is public yet.
+git clone -b record-replay https://gitlab.com/wustl-pctg/cilkplus-rts cilkrtsrr
+
 ## Compile library
 mkdir -p build
 BASE_DIR=$(pwd)
