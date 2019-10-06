@@ -16,7 +16,7 @@ dynamically-loaded library. This library relies on modifications to
 the Cilk runtime library (provided in the cilkrtssuspend directory),
 as well as a special compiler that won't inline some Cilk helper
 functions. You can find such a compiler
-[here](https://gitlab.com/wustl-pctg/llvm-cilk).
+[here](https://gitlab.com/wustl-pctg-pub/llvm-cilk).
 
 ## License
 
@@ -95,3 +95,17 @@ function beforehand. For any cilk_for loops you should also manually specify the
 	
 These restrictions allowed for an easier implementation; they are not
 inherent to the design of PORRidge.
+
+## Cititation
+Please use the following citiation when using this runtime in your work:
+
+Robert Utterback, Kunal Agrawal, I-Ting Angelina Lee, and Milind Kulkarni, "Processor-Oblivious Record and Replay", 
+Proceedings of the 22Nd ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP), 2017.
+Available: https://dl.acm.org/citation.cfm?id=3018764.
+
+## Acknowledgment
+This research was supported in part by National Science Foundation grants CCF-1150036, CCF-1218017, XPS-1439062, CCF-1150013,
+CCF-1439126, CCF-1527692, and Department of Energy grant DE-SC0010295.
+
+Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) 
+and do not necessarily reflect the views of the National Science Foundation and Department of Energy.
